@@ -59,7 +59,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$etage   = $field->parameters->get( 'etage', 'Nb étages' ) ;
 		$balcon   = $field->parameters->get( 'balcon', '' ) ;
 		$exposition   = $field->parameters->get( 'exposition', 'Exposition' ) ;
-		$pdf   = $field->parameters->get( 'pdf', '' ) ;
+		$pdf   = $field->parameters->get( 'pdf', '' ) ;//champ pour l'url du PDF
 
 
 		$required   = $field->parameters->get( 'required', 0 ) ;
@@ -82,7 +82,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			$field->value[0]['etage'] = JText::_($etage, 'Nb étages');
 			$field->value[0]['balcon'] = JText::_($balcon, '');
 			$field->value[0]['exposition'] = JText::_($exposition, 'Exposition');
-			$field->value[0]['pdf'] = JText::_($pdf, '');
+			$field->value[0]['pdf'] = JText::_($pdf, 'pdf');
 			$field->value[0] = serialize($field->value[0]);
 		}
 
@@ -237,13 +237,13 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
-		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
+		JHTML::_('behavior.modal', 'a.modal_'.$field->id);//code pour la popup du file manager
 
 		static $select2_added = false;
 	 	if ( !$select2_added )
 	  	{
 			$select2_added = true;
-			flexicontent_html::loadFramework('select2');
+			flexicontent_html::loadFramework('select2');//code pour ajouter le javascript select2list (on rajoute use_select2_lib dans la class de la liste)
 		}
 		$field->html = array();
 		$n = 0;
@@ -329,7 +329,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 
 			$exposition= JHTML::_('select.genericlist', $options, $fieldname.'[exposition]', " class='yexposition  use_select2_lib'", 'value', 'text', $value['exposition']);
 
-
+			/*début du code pour ajouter le bouton pour lancer le filemanager de FLEXIcontent*/
 			$user = JFactory::getUser();
 			$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
 			$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;autoselect='.$autoselect.'&amp;items=0&amp;filter_uploader='.$user->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
@@ -442,6 +442,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 				$etage = $value['etage'];
 				$balcon = $value['balcon'];
 				$exposition = $value['exposition'];
+				$pdf = $value['pdf'];
 			} else {
 				$type = '';
 				$prix = '';
@@ -449,13 +450,14 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 				$etage = '';
 				$balcon = '';
 				$exposition = '';
+				$pdf = '';
 			}
 
 			// If not using property or property is empty, then use default property value
 			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
 
 
-				$field->{$prop}[] =  '<tr>'.$pretext.'' .$type.''.$posttext. ''.$pretext.''. $prix . ''.$posttext.''.$pretext.''. $surface . ' m2 '.$posttext.''.$pretext.'' .$etage. ''.$posttext.''.$pretext.'' .$balcon. 'm2 '.$posttext.''.$pretext.'' .$exposition. '</tr> ';
+				$field->{$prop}[] =  '<tr>'.$pretext.'' .$type.''.$posttext. ''.$pretext.''. $prix . ''.$posttext.''.$pretext.''. $surface . ' m2 '.$posttext.''.$pretext.'' .$etage. ''.$posttext.''.$pretext.'' .$balcon. 'm2 '.$posttext.''.$pretext.'' .$exposition.''.$posttext.' '.$pdf.''.$posttext.'</tr> ';
 			$n++;
 		}
 
@@ -495,7 +497,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
 					$post[$n] = unserialize($post[$n]);
 				} else {
-					$post[$n] = array('type' => $post[$n], 'prix' => '', 'surface' => '', 'etage' => '', 'balcon' => '', 'exposition'=>'');
+					$post[$n] = array('type' => $post[$n], 'prix' => '', 'surface' => '', 'etage' => '', 'balcon' => '', 'exposition'=>'' ,'pdf'=>'');
 				}
 			}
 
@@ -566,19 +568,5 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('link','title'), $search_properties=array('title'), $properties_spacer=' ', $filter_func=null);
 		return true;
-	}
-
-
-
-	/*
-	VARIOUS HELPER METHODS
-	*/
-
-	function cleanurl($url)
-	{
-		$prefix = array("http://", "https://", "ftp://");
-		$cleanurl = str_replace($prefix, "", $url);
-		return $cleanurl;
-	}
-
+	}	
 }
