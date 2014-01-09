@@ -53,7 +53,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval    = $field->parameters->get( 'max_values', 0 ) ;
 
-		$type      = $field->parameters->get( 'type', 'tx - lot X' ) ;
+		$type      = $field->parameters->get( 'type', 'Tx - lot X' ) ;
 		$prix      = $field->parameters->get( 'prix', 'à partir de €' ) ;
 		$surface   = $field->parameters->get( 'surface', '' ) ;
 		$etage   = $field->parameters->get( 'etage', 'Nb étages' ) ;
@@ -77,10 +77,10 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		if ( !$field->value ) {
 			$field->value = array();
 			$field->value[0]['type']  = JText::_($type, 'tx - lot X');
-			$field->value[0]['prix']  = JText::_($prix, 'à partir de €');
-			$field->value[0]['surface'] = JText::_($surface, '');
+			$field->value[0]['prix']  = JText::_($prix, 'à partir de X€');
+			$field->value[0]['surface'] = JText::_($surface, 'X');
 			$field->value[0]['etage'] = JText::_($etage, 'Nb étages');
-			$field->value[0]['balcon'] = JText::_($balcon, '');
+			$field->value[0]['balcon'] = JText::_($balcon, 'X');
 			$field->value[0]['exposition'] = JText::_($exposition, 'Exposition');
 			$field->value[0]['pdf'] = JText::_($pdf, 'pdf');
 			$field->value[0] = serialize($field->value[0]);
@@ -123,22 +123,22 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 					}
 // CORRECT
 					thisNewField.getElements('input.ytype').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id.");
-					thisNewField.getElements('input.ytype').setProperty('value','');
+					thisNewField.getElements('input.ytype').setProperty('value','Tx - lot X');
 					thisNewField.getElements('input.ytype').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][type]');
 
-					thisNewField.getElements('input.yprix').setProperty('value','0');
+					thisNewField.getElements('input.yprix').setProperty('value','à partir de X€');
 					thisNewField.getElements('input.yprix').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][prix]');
 
-					thisNewField.getElements('input.ysurface').setProperty('value','0');
+					thisNewField.getElements('input.ysurface').setProperty('value','X');
 					thisNewField.getElements('input.ysurface').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][surface]');
 
-					thisNewField.getElements('select.yetage.use_select2_lib').setProperty('value','0');
+					thisNewField.getElements('select.yetage.use_select2_lib').setProperty('value','Nb étages');
 					thisNewField.getElements('select.yetage.use_select2_lib').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][etage]');
 
-					thisNewField.getElements('input.ybalcon').setProperty('value','0');
+					thisNewField.getElements('input.ybalcon').setProperty('value','X');
 					thisNewField.getElements('input.ybalcon').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][balcon]');
 
-					thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('value','0');
+					thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('value','Exposition');
 					thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][exposition]');
 
 					thisNewField.getElements('input.ypdf').setProperty('value','0');
