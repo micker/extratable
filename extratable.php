@@ -457,7 +457,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
 
 
-				$field->{$prop}[] =  '<tr>'.$pretext.'' .$type.''.$posttext. ''.$pretext.''. $prix . ''.$posttext.''.$pretext.''. $surface . ' m2 '.$posttext.''.$pretext.'' .$etage. ''.$posttext.''.$pretext.'' .$balcon. 'm2 '.$posttext.''.$pretext.'' .$exposition.''.$posttext.' '.$pdf.''.$posttext.'</tr> ';
+				$field->{$prop}[] =  '<tr>'.$pretext.'' .$type.''.$posttext. ''.$pretext.''. $prix . ''.$posttext.''.$pretext.''. $surface . ' m2 '.$posttext.''.$pretext.'' .$etage. ''.$posttext.''.$pretext.'' .$balcon. 'm2 '.$posttext.''.$pretext.'' .$exposition.''.$posttext.' '.$pretext.'<a class="btn" href="'.$pdf.'" target="_blank"> Plan PDF</a>'.$posttext.'</tr> ';
 			$n++;
 		}
 
