@@ -111,6 +111,8 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxVal".$field->id."		= ".$maxval.";
 
+			
+			
 			function addField".$field->id."(el) {
 				if((rowCount".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
 
@@ -331,8 +333,9 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 
 			/*début du code pour ajouter le bouton pour lancer le filemanager de FLEXIcontent*/
 			$user = JFactory::getUser();
-			$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
+			$autoselect = 1;
 			$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;autoselect='.$autoselect.'&amp;items=0&amp;filter_uploader='.$user->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
+			$files_data = !empty($field->value);
 			$pdf ="<div class=\"fcfield-button-add\">
 			<div class=\"blank\">
 			<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
