@@ -426,6 +426,10 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			break;
 		}
 
+		//comptage total des lignes
+		$totalLignes= count($values);
+		$field->{$prop}[] = $totalLignes;
+
 		// initialise property
 		$field->{$prop} = array();
 		$n = 0;
