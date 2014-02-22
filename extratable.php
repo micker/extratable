@@ -388,6 +388,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		
 
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
@@ -397,6 +398,12 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		
+		
+		$precount      = $field->parameters->get( 'precount', 'T1 :' ) ;
+		$postcount    = $field->parameters->get( 'postcount', 'appartements' ) ;
+		
+		$lienplan    = $field->parameters->get( 'lienplan', 'plan PDF' ) ;
 	
 
 		switch($separatorf)
@@ -433,6 +440,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		//comptage total des lignes
 		$totalLignes= count($values);
 		$field->{$prop}[] = $totalLignes;
+		$displayTotalLignes = $precount.' '. $totalLignes.' '.$postcount;
 
 		// initialise property
 		$field->{$prop} = array();
@@ -465,14 +473,14 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
 
 
-				$field->{$prop}[] =  '<tr>'.$pretext.'' .$type.''.$posttext. ''.$pretext.''. $prix . ''.$posttext.''.$pretext.''. $surface . ' m2 '.$posttext.''.$pretext.'' .$etage. ''.$posttext.''.$pretext.'' .$balcon. 'm2 '.$posttext.''.$pretext.'' .$exposition.''.$posttext.' '.$pretext.'<a class="btn" href="'.$pdf.'" target="_blank"> Plan PDF</a>'.$posttext.'</tr> ';
+				$field->{$prop}[] =  '<tr>'.$pretext.'' .$type.''.$posttext. ''.$pretext.''. $prix . ''.$posttext.''.$pretext.''. $surface . ' m2 '.$posttext.''.$pretext.'' .$etage. ''.$posttext.''.$pretext.'' .$balcon. 'm2 '.$posttext.''.$pretext.'' .$exposition.''.$posttext.' '.$pretext.'<a class="btn" href="'.$pdf.'" target="_blank">'.$lienplan.'</a>'.$posttext.'</tr> ';
 			$n++;
 		}
 
 		// Apply seperator and open/close tags
 		if(count($field->{$prop})) {
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+			$field->{$prop} = $displayTotalLignes . $opentag . $field->{$prop} . $closetag;
 		} else {
 			$field->{$prop} = '';
 		}

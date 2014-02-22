@@ -85,6 +85,10 @@
 			</field>
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			
+			<field name="precount" type="text" default="" label="FLEXI_FIELD_PRECOUNT_TEXT" description="FLEXI_FIELD_PRECOUNT_TEXT_DESC" />
+			<field name="postcount" type="text" default="" label="FLEXI_FIELD_POSTCOUNT_TEXT" description="FLEXI_FIELD_POSTCOUNT_DESC" />
+			<field name="lienplan" type="text" default="" label="FLEXI_FIELD_LIENPLAN_TEXT" description="FLEXI_FIELD_LIENPLAN_TEXT_DESC" />
 
 			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
 
