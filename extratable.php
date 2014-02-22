@@ -48,7 +48,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$field->label = JText::_($field->label);
 
 		// some parameter shortcuts
-		$document  = JFactory::getDocument();
+		$app				= JFactory::getApplication();
 		$size      = $field->parameters->get( 'size', 30 ) ;
 		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval    = $field->parameters->get( 'max_values', 0 ) ;
@@ -68,8 +68,6 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$document  = JFactory::getDocument();
 		$app				= JFactory::getApplication();
 
-		$size       = $field->parameters->get('size', 30 );
-		$max_values = (int)$field->parameters->get('max_values', 0 );
 
 //dump($field, "FIELD");
 //dump($item, "ITEM");
@@ -143,9 +141,11 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 					thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('value','Exposition');
 					thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][exposition]');
 
-					thisNewField.getElements('input.ypdf').setProperty('value','0');
+					thisNewField.getElements('input.ypdf').setProperty('value','pdf');
 					thisNewField.getElements('input.ypdf').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][pdf]');
 
+					
+				
 
 					// Set hits to zero for new row value
 					if (MooTools.version>='1.2.4') {
