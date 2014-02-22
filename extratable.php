@@ -341,7 +341,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
 			</div>
 		</div>
-		";
+		<input id='".$field->name."' class='".$required."' style='display:none;' name='__fcfld_valcnt__[".$field->name."]' value='".$value["pdf"]."'> ";
 			//generation du code HTML pour un groupe de champ
 			$field->html[] = '
 				'.$type.'
@@ -397,6 +397,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+	
 
 		switch($separatorf)
 		{
