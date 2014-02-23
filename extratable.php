@@ -342,6 +342,13 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			</div>
 		</div>
 		<input id='".$field->name."' class='".$required."' style='display:none;' name='__fcfld_valcnt__[".$field->name."]' value='".$value["pdf"]."'> ";
+
+			// import des plugins pour étendre le champ Extratable (offres, ...)
+			JPluginHelper::importPlugin('amallia');
+			$context = "plg_flexicontent_fields.extratable";
+			$plugincontents="";
+			JDispatcher::getInstance()->trigger('onExtratablePrepareForm', array($context, $item, $field, $n, &$plugincontents, $this->params->toArray()));
+
 			//generation du code HTML pour un groupe de champ
 			$field->html[] = '
 				'.$type.'
