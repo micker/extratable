@@ -103,5 +103,6 @@
 
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_extratable.ini</language>
+		<language tag="fr-FR">fr-FR.plg_flexicontent_fields_extratable.ini</language>
 	</languages>
 </extension>
