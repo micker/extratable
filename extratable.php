@@ -51,7 +51,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$app				= JFactory::getApplication();
 		$size      = $field->parameters->get( 'size', 30 ) ;
 		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
-		$maxval    = $field->parameters->get( 'max_values', 0 ) ;
+		$max_values    = $field->parameters->get( 'max_values', 1000 ) ;
 
 		$type      = $field->parameters->get( 'type', 'Tx - lot X' ) ;
 		$prix      = $field->parameters->get( 'prix', 'à partir de €' ) ;
@@ -59,7 +59,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$etage   = $field->parameters->get( 'etage', 'Nb étages' ) ;
 		$balcon   = $field->parameters->get( 'balcon', '' ) ;
 		$exposition   = $field->parameters->get( 'exposition', 'Exposition' ) ;
-		$pdf   = $field->parameters->get( 'pdf', '' ) ;//champ pour l'url du PDF
+		$pdf   = $field->parameters->get( 'pdf', 'PDF' ) ;//champ pour l'url du PDF
 
 
 		$required   = $field->parameters->get( 'required', 0 ) ;
@@ -80,11 +80,32 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			$field->value[0]['etage'] = JText::_($etage, 'Nb étages');
 			$field->value[0]['balcon'] = JText::_($balcon, 'X');
 			$field->value[0]['exposition'] = JText::_($exposition, 'Exposition');
-			$field->value[0]['pdf'] = JText::_($pdf, 'pdf');
+			$field->value[0]['pdf'] = JText::_($pdf, '');
 			$field->value[0] = serialize($field->value[0]);
 		}
+		$user = JFactory::getUser();
+		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
+		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 
-		$js = "";
+		$js = "
+			var value_counter".$field->id."=".count($field->value).";
+			var maxValues".$field->id."=".$max_values.";
+			var activeRow".$field->id." = '';
+			
+			function qfSelectFile".$field->id."(id, file)
+			{
+				var pdf_fileid = activeRow".$field->id."+'_pdf';
+				var pdf_filename = activeRow".$field->id."+'_pdf_filename';
+				pdf_fileid   = pdf_fileid.replace('_addfile','');
+				pdf_filename = pdf_filename.replace('_addfile','');
+				
+				var pdf_fileid   = window.document.getElementById(pdf_fileid);
+				var pdf_filename = window.document.getElementById(pdf_filename);
+				pdf_fileid.value = id;
+				pdf_filename.value = file;
+				(MooTools.version>='1.2.4') ?  window.SqueezeBox.close()  :  window.document.getElementById('sbox-window').close();
+			}
+		";
 
 		if ($multiple) // handle multiple records
 		{
@@ -101,14 +122,10 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 				});
 			";
 
-			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
-			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
-
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxVal".$field->id."		= ".$maxval.";
-
+			var maxVal".$field->id."		= ".$max_values.";
 			
 			
 			function addField".$field->id."(el) {
@@ -121,40 +138,57 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 					} else {
 						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
 					}
-// CORRECT
-					thisNewField.getElements('input.ytype').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id.");
 					thisNewField.getElements('input.ytype').setProperty('value','Tx - lot X');
 					thisNewField.getElements('input.ytype').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][type]');
+					thisNewField.getElements('input.ytype').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_type');
 
 					thisNewField.getElements('input.yprix').setProperty('value','à partir de X€');
 					thisNewField.getElements('input.yprix').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][prix]');
+					thisNewField.getElements('input.yprix').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_prix');
 
 					thisNewField.getElements('input.ysurface').setProperty('value','X');
 					thisNewField.getElements('input.ysurface').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][surface]');
+					thisNewField.getElements('input.ysurface').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_surface');
 
 					thisNewField.getElements('select.yetage.use_select2_lib').setProperty('value','Nb étages');
 					thisNewField.getElements('select.yetage.use_select2_lib').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][etage]');
+					thisNewField.getElements('select.yetage.use_select2_lib').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_etage');
 
 					thisNewField.getElements('input.ybalcon').setProperty('value','X');
 					thisNewField.getElements('input.ybalcon').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][balcon]');
+					thisNewField.getElements('input.ybalcon').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_balcon');
 
 					thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('value','Exposition');
 					thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][exposition]');
+					thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_exposition');
 
 					thisNewField.getElements('input.ypdf').setProperty('value','pdf');
 					thisNewField.getElements('input.ypdf').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][pdf]');
 
+					thisNewField.getElements('input.ypdf').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_pdf');
 					
-				
 
-					// Set hits to zero for new row value
+					thisNewField.getElements('a.addfile_".$field->id."').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
+					thisNewField.getElements('a.addfile_".$field->id."').setProperty('href','".
+					JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&index="+uniqueRowNum'.$field->id.'+"&field='.$field->id.'&itemid='.$item->id.'&autoselect=1&items=0&filter_uploader='.$user->id.'&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1');
+					jQuery(thisNewField).insertAfter( jQuery(thisField) );
+
+					SqueezeBox.initialize({});
 					if (MooTools.version>='1.2.4') {
-						thisNewField.getElements('span span').set('html','0');
+
+						SqueezeBox.assign($$('a.addfile_".$field->id."'), {
+							parse: 'rel'
+						});
 					} else {
-						thisNewField.getElements('span span').setHTML('0');
+
+						$$('a.addfile_".$field->id."').each(function(el) {
+							el.addEvent('click', function(e) {
+								new Event(e).stop();
+								SqueezeBox.fromElement(el);
+							});
+						});
 					}
 
-					jQuery(thisNewField).insertAfter( jQuery(thisField) );
 
 					new Sortables($('sortables_".$field->id."'), {
 						'constrain': true,
@@ -239,26 +273,36 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
-		JHTML::_('behavior.modal', 'a.modal_'.$field->id);//code pour la popup du file manager
-
+		JHTML::_('behavior.modal', 'a.addfile_'.$field->id);//code pour la popup du file manager
 		static $select2_added = false;
 	 	if ( !$select2_added )
 	  	{
 			$select2_added = true;
 			flexicontent_html::loadFramework('select2');//code pour ajouter le javascript select2list (on rajoute use_select2_lib dans la class de la liste)
 		}
-		$field->html = array();
-		$n = 0;
+// Get file data via a single call
+		$file_ids = array();
+		$values   = array();
 		foreach ($field->value as $value) {
 //dump('custom['.$field->name.']['.$n.']' , "new field");
 			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
 				$value = unserialize($value);
 			} else {
-				$value = array('type' => '', 'prix' => '', 'surface' => '', 'etage' => '', 'balcon'=>'', 'exposition' => '', 'pdf' => '');
+				$value = array('type' => '', 'prix' => '', 'surface' => '', 'etage' => '', 'balcon'=>'', 'exposition' => '', 'pdf' => $value);
 			}
+			$file_ids[] = $value['pdf'];
+			$values[] = $value;
+		}
+		$files_data = $this->getFileData( $file_ids, $published=false );
+		print_r($files_data);
+		
+		$field->html = array();
+		$n = 0;
+		foreach ($values as $value)
+		{
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']['.$n.']' : $field->name.'['.$n.']';
 //dump($fieldname , "new fieldname");
-			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+			$elementid = FLEXI_J16GE ? 'custom_'.$field->name.'_'.$n : $field->name.'_'.$n;
 //dump($value , "value ".$n);
 
 
@@ -304,10 +348,10 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
                         $i++;
                 }
 
-			$etage= JHTML::_('select.genericlist', $options, $fieldname.'[etage]', " class='yetage use_select2_lib'", 'value', 'text', $value['etage']);
+			$etage= JHTML::_('select.genericlist', $options, $fieldname.'[etage]', " class='yetage use_select2_lib'", 'value', 'text', $value['etage'], $elementid.'_etage');
 			$balcon= '
-				<label class="label">Balcon/Terrase :</label>
-				<input class="ybalcon fcfield_textval inputbox" name="'.$fieldname.'[balcon]" type="text" size="2" value="'.$value['balcon'].'" />
+				<label class="label" >Balcon/Terrase :</label>
+				<input class="ybalcon fcfield_textval inputbox" name="'.$fieldname.'[balcon]" id="'.$elementid.'_balcon"  type="text" size="2" value="'.$value['balcon'].'" />
 			';
 			// generate state drop down list
 
@@ -329,19 +373,32 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
                         $i++;
                 }
 
-			$exposition= JHTML::_('select.genericlist', $options, $fieldname.'[exposition]', " class='yexposition  use_select2_lib'", 'value', 'text', $value['exposition']);
+			$exposition= JHTML::_('select.genericlist', $options, $fieldname.'[exposition]', " class='yexposition  use_select2_lib'", 'value', 'text', $value['exposition'], $elementid.'_exposition');
 
 			/*début du code pour ajouter le bouton pour lancer le filemanager de FLEXIcontent*/
 			$user = JFactory::getUser();
 			$autoselect = 1;
-			$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;autoselect='.$autoselect.'&amp;items=0&amp;filter_uploader='.$user->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
-			$files_data = !empty($field->value);
-			$pdf ="<div class=\"fcfield-button-add\">
+			$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&index='.$i.'&field='.$field->id.'&itemid='.$item->id.'&autoselect='.$autoselect.'&items=0&filter_uploader='.$user->id.'&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
+			$fileid = (int) (@ $value['pdf'] );
+			if ( !empty($files_data[$fileid]) )
+			{
+				$file_data = $files_data[$fileid];
+				$filename  = $file_data->filename;
+			} else {
+				$fileid = '';
+				$filename = '';
+			}
+			
+			$pdf= '
+				<label class="label" >PDF:</label>
+				<input class="ypdf fcfield_textval inputbox" name="'.$fieldname.'[pdf]" id="'.$elementid.'_pdf"  type="hidden" size="2" value="'.$fileid.'" />
+				<input class="ypdf fcfield_textval inputbox" name="'.$fieldname.'[pdf_filename]" id="'.$elementid.'_pdf_filename"  type="text" size="15" value="'.$filename.'" />
+			';
+			$pdf .="<div class=\"fcfield-button-add\" style=\"display:inline-block;\">
 			<div class=\"blank\">
-			<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
-			</div>
-		</div>
-		<input id='".$field->name."' class='".$required."' style='display:none;' name='__fcfld_valcnt__[".$field->name."]' value='".$value["pdf"]."'> ";
+			<a class=\"addfile_".$field->id."\" onclick='activeRow".$field->id."=this.id.replace(\"_addfile\",\"\");' id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_SELECT_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT_FILE' )."</a>
+			</div></div> "
+			;
 
 			// import des plugins pour étendre le champ Extratable (offres, ...)
 			JPluginHelper::importPlugin('amallia');
@@ -351,6 +408,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 
 			//generation du code HTML pour un groupe de champ
 			$field->html[] = '
+			<div style="border: 1px solid #ccc; border-radius:5px;padding:5px;margin-bottom:5pxmargin-top:5px;background:#e1e1e1;">
 				'.$type.'
 				'.$prix.'
 				'.$surface.'
@@ -358,8 +416,10 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 				'.$balcon.'
 				'.$exposition.'
 				'.$pdf.'
+				<br>
 				'.$move2.'
 				'.$remove_button.'
+				</div>
 				';
 
 			$n++;
@@ -367,12 +427,14 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		}
 
 		if ($multiple) { // handle multiple records
-			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
-			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+			$li_list = '<li>'. implode('</li><li>', $field->html) .'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$li_list. '</ul>';
 			$field->html .= '<input type="button" class="fcfield-addvalue" style="clear:both;" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 		} else {  // handle single values
 			$field->html = $field->html[0];
 		}
+		$field->html = '<hr/>'.$field->html;
+		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'">';
 	}
 
 
@@ -448,7 +510,9 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$totalLignes= count($values);
 		$field->{$prop}[] = $totalLignes;
 		$displayTotalLignes = $precount.' '. $totalLignes.' '.$postcount;
-
+		
+		$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
+		
 		// initialise property
 		$field->{$prop} = array();
 		$n = 0;
@@ -480,10 +544,9 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
 
 
-				$field->{$prop}[] =  '<tr>'.$pretext.'' .$type.''.$posttext. ''.$pretext.''. $prix . ''.$posttext.''.$pretext.''. $surface . ' m2 '.$posttext.''.$pretext.'' .$etage. ''.$posttext.''.$pretext.'' .$balcon. 'm2 '.$posttext.''.$pretext.'' .$exposition.''.$posttext.' '.$pretext.'<a class="btn" href="'.$pdf.'" target="_blank">'.$lienplan.'</a>'.$posttext.'</tr> ';
+				$field->{$prop}[] =  '<tr>'.$pretext.'' .$type.''.$posttext. ''.$pretext.''. $prix . ''.$posttext.''.$pretext.''. $surface . ' m2 '.$posttext.''.$pretext.'' .$etage. ''.$posttext.''.$pretext.'' .$balcon. 'm2 '.$posttext.''.$pretext.'' .$exposition.''.$posttext.' '.$pretext.'<a class="btn" href="'.$dl_link.'" target="_blank">'.$lienplan.'</a>'.$posttext.'</tr> ';
 			$n++;
 		}
-
 		// Apply seperator and open/close tags
 		if(count($field->{$prop})) {
 			$field->{$prop} = implode($separatorf, $field->{$prop});
@@ -520,7 +583,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
 					$post[$n] = unserialize($post[$n]);
 				} else {
-					$post[$n] = array('type' => $post[$n], 'prix' => '', 'surface' => '', 'etage' => '', 'balcon' => '', 'exposition'=>'' ,'pdf'=>'');
+					$post[$n] = array('type' => '', 'prix' => '', 'surface' => '', 'etage' => '', 'balcon' => '', 'exposition'=>'' ,'pdf'=> $post[$n]);
 				}
 			}
 
@@ -592,4 +655,51 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('link','title'), $search_properties=array('title'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}	
+	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
+	
+	function getFileData( $value, $published=1, $extra_select='' )
+	{
+		// Find which file data are already cached, and if no new file ids to query, then return cached only data
+		static $cached_data = array();
+		$return_data = array();
+		$new_ids = array();
+		$values = is_array($value) ? $value : array($value);
+		foreach ($values as $file_id) {
+			$f = (int)$file_id;
+			if ( !isset($cached_data[$f]) && $f)
+				$new_ids[] = $f;
+		}
+		
+		// Get file data not retrieved already
+		if ( count($new_ids) )
+		{
+			// Only query files that are not already cached
+			$db = JFactory::getDBO();
+			$query = 'SELECT * '. $extra_select //filename, altname, description, ext, id'
+					. ' FROM #__flexicontent_files'
+					. ' WHERE id IN ('. implode(',', $new_ids) . ')'
+					. ($published ? '  AND published = 1' : '')
+					;
+			$db->setQuery($query);
+			$new_data = $db->loadObjectList('id');
+
+			if ($new_data) foreach($new_data as $file_id => $file_data) {
+				$cached_data[$file_id] = $file_data;
+			}
+		}
+		
+		// Finally get file data in correct order
+		foreach($values as $file_id) {
+			$f = (int)$file_id;
+			if ( isset($cached_data[$f]) && $f)
+				$return_data[$file_id] = $cached_data[$f];
+		}
+
+		return !is_array($value) ? @$return_data[(int)$value] : $return_data;
+	}
+
 }
