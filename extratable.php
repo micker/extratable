@@ -192,8 +192,6 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 						});
 					}
 
-
-
 					new Sortables($('sortables_".$field->id."'), {
 						'constrain': true,
 						'clone': true,
@@ -343,22 +341,6 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
                                                 array('8','8'),
                                                 array('9','9'),
                                                 array('10','10'));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 $options = array();
                 $options[] = JHTML::_('select.option', '', 'Nb Etage');
                 $i = 1;
@@ -371,10 +353,6 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
                         }
                         $i++;
                 }
-
-
-
-
 			$etage= JHTML::_('select.genericlist', $options, $fieldname.'[etage]', " class='yetage use_select2_lib'", 'value', 'text', $value['etage'], $elementid.'_etage');
 			$balcon= '
 				<label class="label" >Balcon/Terrase :</label>
@@ -388,12 +366,6 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
                                                 array('est','est'),
                                                 array('ouest','ouest'));
 
-
-
-
-
-
-
                 $options = array();
                 $options[] = JHTML::_('select.option', '', 'Exposition');
                 $i = 1;
@@ -406,9 +378,6 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
                         }
                         $i++;
                 }
-
-
-
 
 			$exposition= JHTML::_('select.genericlist', $options, $fieldname.'[exposition]', " class='yexposition  use_select2_lib'", 'value', 'text', $value['exposition'], $elementid.'_exposition');
 
@@ -443,8 +412,6 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			$context = "plg_flexicontent_fields.extratable";
 			$plugincontents="";
 			JDispatcher::getInstance()->trigger('onExtratablePrepareForm', array($context, $item, $field, $n, &$plugincontents, $this->params->toArray()));
-
-
 
 
 			//generation du code HTML pour un groupe de champ
@@ -599,8 +566,6 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			$field->{$prop} = '';
 		}
 	}
-
-
 
 
 
