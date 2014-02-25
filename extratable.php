@@ -431,6 +431,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 				<br>
 				'.$move2.'
 				'.$remove_button.'
+				'.$plugincontents.'
 				</div>
 
 				';
