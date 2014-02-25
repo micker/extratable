@@ -80,7 +80,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			$field->value[0]['etage'] = JText::_($etage, 'Nb étages');
 			$field->value[0]['balcon'] = JText::_($balcon, 'X');
 			$field->value[0]['exposition'] = JText::_($exposition, 'Exposition');
-			$field->value[0]['pdf'] = JText::_($pdf, '');
+			$field->value[0]['pdf'] = $pdf;
 			$field->value[0] = serialize($field->value[0]);
 		}
 
@@ -288,27 +288,34 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		}
 
 
-		// Get file data via a single call
+		// ***********************************
+		// Get data of files via a single call
+		// ***********************************
+		
 		$file_ids = array();
-		$values   = array();
-		foreach ($field->value as $value) 
+		$unserialized_values = array();
+		foreach ($field->value as $value)
 		{
-		//dump('custom['.$field->name.']['.$n.']' , "new field");
 
+
+			if ( empty($value) ) continue;
+			
+			// Compatibility for old unserialized values e.g. 'file' field
 			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
 				$value = unserialize($value);
 			} else {
 				$value = array('type' => '', 'prix' => '', 'surface' => '', 'etage' => '', 'balcon'=>'', 'exposition' => '', 'pdf' => $value);
 			}
 			$file_ids[] = $value['pdf'];
-			$values[] = $value;
+			$unserialized_values[] = $value;
 		}
 		$files_data = $this->getFileData( $file_ids, $published=false );
 		//print_r($files_data);
 		
+		
 		$field->html = array();
 		$n = 0;
-		foreach ($values as $value)
+		foreach ($unserialized_values as $value)
 		{
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']['.$n.']' : $field->name.'['.$n.']';
 //dump($fieldname , "new fieldname");
@@ -390,10 +397,10 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			$autoselect = 1;
 			$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&index='.$i.'&field='.$field->id.'&itemid='.$item->id.'&autoselect='.$autoselect.'&items=0&filter_uploader='.$user->id.'&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
 
-			$fileid = (int) (@ $value['pdf'] );
-			if ( !empty($files_data[$fileid]) )
+			$file_id = (int) (@ $value['pdf'] );
+			if ( !empty($files_data[$file_id]) )
 			{
-				$file_data = $files_data[$fileid];
+				$file_data = $files_data[$file_id];
 				$filename  = $file_data->filename;
 			} else {
 				$fileid = '';
@@ -402,12 +409,12 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			
 			$pdf= '
 				<label class="label" >PDF:</label>
-				<input class="ypdf fcfield_textval inputbox" name="'.$fieldname.'[pdf]" id="'.$elementid.'_pdf"  type="hidden" size="2" value="'.$fileid.'" />
+				<input class="ypdf fcfield_textval inputbox" name="'.$fieldname.'[pdf]" id="'.$elementid.'_pdf"  type="hidden" size="2" value="'.$file_id.'" />
 				<input class="ypdf fcfield_textval inputbox" name="'.$fieldname.'[pdf_filename]" id="'.$elementid.'_pdf_filename"  type="text" size="15" value="'.$filename.'" />
 			';
 			$pdf .="<div class=\"fcfield-button-add\" style=\"display:inline-block;\">
 			<div class=\"blank\">
-			<a class=\"addfile_".$field->id."\" onclick='activeRow".$field->id."=this.id.replace(\"_addfile\",\"\");' id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_PDF' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT' )."</a>
+			<a class=\"addfile_".$field->id."\" onclick='activeRow".$field->id."=this.id.replace(\"_addfile\",\"\");' id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_PDF' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_PDF' )."</a>
 			</div></div>
 			";
 
@@ -482,8 +489,8 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_value_title', '' )) : '';
 		
 		
-		$precount      = $field->parameters->get( 'precount', 'T1 :' ) ;
-		$postcount    = $field->parameters->get( 'postcount', 'appartements' ) ;
+		$precount   = $field->parameters->get( 'precount', 'T1 :' ) ;
+		$postcount  = $field->parameters->get( 'postcount', 'appartements' ) ;
 		
 		$lienplan    = $field->parameters->get( 'lienplan', 'plan PDF' ) ;
 	
@@ -519,61 +526,134 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			break;
 		}
 
-		//comptage total des lignes
-		$totalLignes= count($values);
-		$field->{$prop}[] = $totalLignes;
-		$displayTotalLignes = $precount.' '. $totalLignes.' '.$postcount;
-		
-		  
-		
-		$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
+		// ***********************************
+		// Get data of files via a single call
+		// ***********************************
 		
 
-		// initialise property
-		$field->{$prop} = array();
-		$n = 0;
+		$file_ids = array();
+		$unserialized_values = array();
 		foreach ($values as $value)
 		{
 			if ( empty($value) ) continue;
-
-			// Compatibility for old unserialized values
-			$value = (@unserialize($value)!== false || $value === 'b:0;') ? unserialize($value) : $value;
-			if ( is_array($value) ) {
-				$type = $value['type'];
-				$prix = $value['prix'];
-				$surface = $value['surface'];
-				$etage = $value['etage'];
-				$balcon = $value['balcon'];
-				$exposition = $value['exposition'];
-				$pdf = $value['pdf'];
+			
+			// Compatibility for old unserialized values e.g. 'file' field
+			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
+				$value = unserialize($value);
 			} else {
-				$type = '';
-				$prix = '';
-				$surface = '';
-				$etage = '';
-				$balcon = '';
-				$exposition = '';
-				$pdf = '';
+				$value = array('type' => '', 'prix' => '', 'surface' => '', 'etage' => '', 'balcon'=>'', 'exposition' => '', 'pdf' => $value);
+			}
+			$file_ids[] = $value['pdf'];
+			$unserialized_values[] = $value;
+		}
+		$files_data = $this->getFileData( $file_ids, $published=false );
+		
+
+		
+
+		// ***************************************************
+		// Get user access level (these are multiple for J2.5)
+		// ***************************************************
+		$user = JFactory::getUser();
+		if (FLEXI_J16GE) $aid_arr = $user->getAuthorisedViewLevels();
+		else             $aid = (int) $user->get('aid');
+		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
+		$regaccess_only_msg = 'register to download';
+		$noaccess_msg = 'no download access';
+		
+		// ************************************************************************
+		// initialise display property, and loop through values creating their HTML
+		// ************************************************************************
+		
+		$field->{$prop} = array();
+		$n = 0;
+		foreach ($unserialized_values as $value)
+		{
+			$file_id = (int) $value['pdf'];
+			if ( empty($files_data[$file_id]) ) continue;
+
+
+
+			
+			
+			// *****************************
+			// Check user access on the file
+			// *****************************
+			
+			$authorized = true;
+			$is_public  = true;
+			if ( !empty($file_data->access) ) {
+				if (FLEXI_J16GE) {
+					$authorized = in_array($files_data[$file_id]->access,$aid_arr);
+					$is_public  = in_array($public_acclevel,$aid_arr);
+
+
+
+
+
+
+
+				} else {
+					$authorized = $files_data[$file_id]->access <= $aid;
+					$is_public  = $files_data[$file_id]->access <= $public_acclevel;
+				}
+			}
+			
+			// *****************************************************
+			// Create the download link -or- set a no access message
+			// *****************************************************
+			
+			if ( !$authorized && $is_public ) {
+				$dl_text = $regaccess_only_msg;
+			} else if ( !$authorized ) {
+				$dl_text = $noaccess_msg;  // maybe create a parameter for no access message ?
+			} else {
+
+
+
+
+
+
+
+				$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
+				$dl_text = '<a class="btn" href="'.$dl_link.'">'.$lienplan.'</a>';
 			}
 
-			// If not using property or property is empty, then use default property value
-			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
 
+
+
+			// ****************************
+			// Create the HTML of the value
+			// ****************************
 
 			$field->{$prop}[] =
 				'<tr>'.
-					$pretext.''.$type.''.$posttext.''.
-					$pretext.''.$prix.''.$posttext.''.
-					$pretext.''.$surface.' m2 '.$posttext.''.
-					$pretext.''.$etage.''.$posttext.''.
-					$pretext.''.$balcon. ' m2 '.$posttext.''.
-					$pretext.''.$exposition.''.$posttext.''.
-					$pretext.'<a class="btn" href="'.$files_data.'" target="_blank">'.$lienplan.'</a>'.$posttext.
+					$pretext.''.@ $value['type'].''.$posttext.''.
+					$pretext.''.@ $value['prix'].''.$posttext.''.
+					$pretext.''.@ $value['surface'].' m2 '.$posttext.''.
+					$pretext.''.@ $value['etage'].''.$posttext.''.
+					$pretext.''.@ $value['balcon']. ' m2 '.$posttext.''.
+					$pretext.''.@ $value['exposition'].''.$posttext.''.
+
+					$pretext.$dl_text.$posttext.
 				'</tr> ';
+			
 			$n++;
 		}
+		
+		
+		// *******************
+		// Get total of values
+		// *******************
+		$totalLignes = $n;
+		$displayTotalLignes = $precount.' '. $totalLignes.' '.$postcount;
+		
+		
+		// **********************************************************
+		// Display field HTML, applying separator and open/close tags
+		// **********************************************************
 
-		// Apply seperator and open/close tags
+
 		if(count($field->{$prop})) {
 			$field->{$prop} = implode($separatorf, $field->{$prop});
 			$field->{$prop} = $displayTotalLignes . $opentag . $field->{$prop} . $closetag;
@@ -686,7 +766,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		return true;
 	}	
 	
-	
+
 	// **********************
 	// VARIOUS HELPER METHODS
 	// **********************
