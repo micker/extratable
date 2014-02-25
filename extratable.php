@@ -304,7 +304,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			$values[] = $value;
 		}
 		$files_data = $this->getFileData( $file_ids, $published=false );
-		print_r($files_data);
+		//print_r($files_data);
 		
 		$field->html = array();
 		$n = 0;
