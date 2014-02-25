@@ -373,7 +373,11 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 
                         $listarrays2 = array(
                                                 array('nord','nord'),
+												array('nord-ouest','nord-ouest'),
+												array('nord-est','nord-est'),
                                                 array('sud','sud'),
+												array('sud-ouest','sud-ouest'),
+												array('sud-est','sud-est'),
                                                 array('est','est'),
                                                 array('ouest','ouest'));
 
@@ -547,10 +551,9 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			$unserialized_values[] = $value;
 		}
 		$files_data = $this->getFileData( $file_ids, $published=false );
-		
 
 		
-
+		
 		// ***************************************************
 		// Get user access level (these are multiple for J2.5)
 		// ***************************************************
@@ -561,6 +564,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$regaccess_only_msg = 'register to download';
 		$noaccess_msg = 'no download access';
 		
+		
 		// ************************************************************************
 		// initialise display property, and loop through values creating their HTML
 		// ************************************************************************
@@ -570,12 +574,8 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		foreach ($unserialized_values as $value)
 		{
 			$file_id = (int) $value['pdf'];
-			if ( empty($files_data[$file_id]) ) continue;
+			//if ( empty($files_data[$file_id]) ) continue; //si pdf vide
 
-
-
-			
-			
 			// *****************************
 			// Check user access on the file
 			// *****************************
@@ -586,13 +586,6 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 				if (FLEXI_J16GE) {
 					$authorized = in_array($files_data[$file_id]->access,$aid_arr);
 					$is_public  = in_array($public_acclevel,$aid_arr);
-
-
-
-
-
-
-
 				} else {
 					$authorized = $files_data[$file_id]->access <= $aid;
 					$is_public  = $files_data[$file_id]->access <= $public_acclevel;
@@ -607,14 +600,9 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 				$dl_text = $regaccess_only_msg;
 			} else if ( !$authorized ) {
 				$dl_text = $noaccess_msg;  // maybe create a parameter for no access message ?
+			} else if ( empty($files_data[$file_id]) ){
+				$dl_text = '';
 			} else {
-
-
-
-
-
-
-
 				$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
 				$dl_text = '<a class="btn" href="'.$dl_link.'">'.$lienplan.'</a>';
 			}
