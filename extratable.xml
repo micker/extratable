@@ -2,12 +2,12 @@
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
 	<name>FLEXIcontent - Extra table</name>
 	<author>Yannick berges</author>
-	<creationDate>nov 2013</creationDate>
-	<copyright>Copyright (C) 2013 com3elles</copyright>
+	<creationDate>February 2014</creationDate>
+	<copyright>Copyright (C) 2013-2014 com3elles</copyright>
 	<license>GNU/GPL v2</license>
 	<authorEmail>yannick@com3elles.com</authorEmail>
 	<authorUrl>www.com3elles.com</authorUrl>
-	<version>1.0</version>
+	<version>1.1.0</version>
 	<description>FLEXI_FIELD_EXTRATABLE</description>
 	<files>
 		<filename plugin="extratable">extratable.php</filename>
