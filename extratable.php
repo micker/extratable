@@ -48,10 +48,10 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$field->label = JText::_($field->label);
 
 		// some parameter shortcuts
-		$app				= JFactory::getApplication();
+		$app       = JFactory::getApplication();
 		$size      = $field->parameters->get( 'size', 30 ) ;
 		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
-		$max_values    = $field->parameters->get( 'max_values', 1000 ) ;
+		$max_values= $field->parameters->get( 'max_values', 1000 ) ;
 
 		$type      = $field->parameters->get( 'type', 'Tx - lot X' ) ;
 		$prix      = $field->parameters->get( 'prix', 'à partir de €' ) ;
@@ -59,7 +59,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$etage   = $field->parameters->get( 'etage', 'Nb étages' ) ;
 		$balcon   = $field->parameters->get( 'balcon', '' ) ;
 		$exposition   = $field->parameters->get( 'exposition', 'Exposition' ) ;
-		$pdf   = $field->parameters->get( 'pdf', 'PDF' ) ;//champ pour l'url du PDF
+		$pdf   = $field->parameters->get( 'pdf', '' ) ;//champ pour l'url du PDF
 
 
 		$required   = $field->parameters->get( 'required', 0 ) ;
@@ -139,6 +139,8 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 					} else {
 						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
 					}
+					var has_select2  = jQuery(thisNewField).find('div.select2-container').length != 0;
+					if (has_select2) jQuery(thisNewField).find('div.select2-container').remove();
 
 					thisNewField.getElements('input.ytype').setProperty('value','Tx - lot X');
 					thisNewField.getElements('input.ytype').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][type]');
@@ -173,7 +175,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 					thisNewField.getElements('a.addfile_".$field->id."').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
 					thisNewField.getElements('a.addfile_".$field->id."').setProperty('href','".
 					JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&index="+uniqueRowNum'.$field->id.'+"&field='.$field->id.'&itemid='.$item->id.'&autoselect=1&items=0&filter_uploader='.$user->id.'&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1');
-
+					if (has_select2)  jQuery(thisNewField).find('select.use_select2_lib').select2();
 					jQuery(thisNewField).insertAfter( jQuery(thisField) );
 
 					SqueezeBox.initialize({});
@@ -234,6 +236,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			";
 
 			$css = '
+			#sortables_'.$field->id.' table.admintable td {padding-top:0px; paddin-bottom:0px;}
 			#flexicontent input.fcfield_textval {
   				height: 26px !important;
   				line-height: 26px !important;
@@ -285,11 +288,12 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		}
 
 
-// Get file data via a single call
+		// Get file data via a single call
 		$file_ids = array();
 		$values   = array();
-		foreach ($field->value as $value) {
-//dump('custom['.$field->name.']['.$n.']' , "new field");
+		foreach ($field->value as $value) 
+		{
+		//dump('custom['.$field->name.']['.$n.']' , "new field");
 
 			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
 				$value = unserialize($value);
@@ -353,7 +357,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
                         }
                         $i++;
                 }
-			$etage= JHTML::_('select.genericlist', $options, $fieldname.'[etage]', " class='yetage use_select2_lib'", 'value', 'text', $value['etage'], $elementid.'_etage');
+			$etage= '<label class="label" >Etages:</label>'.JHTML::_('select.genericlist', $options, $fieldname.'[etage]', " class='yetage use_select2_lib'", 'value', 'text', $value['etage'], $elementid.'_etage');
 			$balcon= '
 				<label class="label" >Balcon/Terrase :</label>
 				<input class="ybalcon fcfield_textval inputbox" name="'.$fieldname.'[balcon]" id="'.$elementid.'_balcon"  type="text" size="2" value="'.$value['balcon'].'" />
@@ -379,7 +383,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
                         $i++;
                 }
 
-			$exposition= JHTML::_('select.genericlist', $options, $fieldname.'[exposition]', " class='yexposition  use_select2_lib'", 'value', 'text', $value['exposition'], $elementid.'_exposition');
+			$exposition= '<label class="label" >Exposition:</label>'.JHTML::_('select.genericlist', $options, $fieldname.'[exposition]', " class='yexposition  use_select2_lib'", 'value', 'text', $value['exposition'], $elementid.'_exposition');
 
 			/*début du code pour ajouter le bouton pour lancer le filemanager de FLEXIcontent*/
 			$user = JFactory::getUser();
@@ -399,13 +403,13 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			$pdf= '
 				<label class="label" >PDF:</label>
 				<input class="ypdf fcfield_textval inputbox" name="'.$fieldname.'[pdf]" id="'.$elementid.'_pdf"  type="hidden" size="2" value="'.$fileid.'" />
-				<input class="ypdf fcfield_textval inputbox" name="'.$fieldname.'[pdf_filename]" id="'.$elementid.'_pdf_filename"  type="text" size="2" value="'.$filename.'" />
+				<input class="ypdf fcfield_textval inputbox" name="'.$fieldname.'[pdf_filename]" id="'.$elementid.'_pdf_filename"  type="text" size="15" value="'.$filename.'" />
 			';
 			$pdf .="<div class=\"fcfield-button-add\" style=\"display:inline-block;\">
 			<div class=\"blank\">
-			<a class=\"addfile_".$field->id."\" onclick='activeRow".$field->id."=this.id.replace(\"_addfile\",\"\");' id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_SELECT_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT_FILE' )."</a>
-			</div></div> "
-			;
+			<a class=\"addfile_".$field->id."\" onclick='activeRow".$field->id."=this.id.replace(\"_addfile\",\"\");' id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_PDF' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT' )."</a>
+			</div></div>
+			";
 
 			// import des plugins pour étendre le champ Extratable (offres, ...)
 			JPluginHelper::importPlugin('amallia');
@@ -416,7 +420,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 
 			//generation du code HTML pour un groupe de champ
 			$field->html[] = '
-			<div style="border: 1px solid #ccc; border-radius:5px;padding:5px;margin-bottom:5pxmargin-top:5px;background:#e1e1e1;">
+			<div style="border: 1px solid #ccc; border-radius:5px;padding:5px;margin-bottom:5pxmargin-top:5px;background:#F4F4F4;">
 				'.$type.'
 				'.$prix.'
 				'.$surface.'
@@ -442,7 +446,6 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		} else {  // handle single values
 			$field->html = $field->html[0];
 		}
-		$field->html = '<hr/>'.$field->html;
 		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'">';
 	}
 
@@ -520,6 +523,8 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$field->{$prop}[] = $totalLignes;
 		$displayTotalLignes = $precount.' '. $totalLignes.' '.$postcount;
 		
+		  
+		
 		$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
 		
 
@@ -554,7 +559,16 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
 
 
-				$field->{$prop}[] =  '<tr>'.$pretext.'' .$type.''.$posttext. ''.$pretext.''. $prix . ''.$posttext.''.$pretext.''. $surface . ' m2 '.$posttext.''.$pretext.'' .$etage. ''.$posttext.''.$pretext.'' .$balcon. 'm2 '.$posttext.''.$pretext.'' .$exposition.''.$posttext.' '.$pretext.'<a class="btn" href="'.$dl_link.'" target="_blank">'.$lienplan.'</a>'.$posttext.'</tr> ';
+			$field->{$prop}[] =
+				'<tr>'.
+					$pretext.''.$type.''.$posttext.''.
+					$pretext.''.$prix.''.$posttext.''.
+					$pretext.''.$surface.' m2 '.$posttext.''.
+					$pretext.''.$etage.''.$posttext.''.
+					$pretext.''.$balcon. ' m2 '.$posttext.''.
+					$pretext.''.$exposition.''.$posttext.''.
+					$pretext.'<a class="btn" href="'.$files_data.'" target="_blank">'.$lienplan.'</a>'.$posttext.
+				'</tr> ';
 			$n++;
 		}
 
@@ -601,8 +615,8 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 				}
 			}
 
-		$newpost[$new] = $post[$n];
-		$new++;
+			$newpost[$new] = $post[$n];
+			$new++;
 		}
 		// Serialize multi-property data before storing them into the DB
 		foreach($post as $i => $v) {
