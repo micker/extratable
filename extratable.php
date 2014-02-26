@@ -53,8 +53,10 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
 		$max_values= $field->parameters->get( 'max_values', 1000 ) ;
 
-		$type      = $field->parameters->get( 'type', 'Tx - lot X' ) ;
-		$prix      = $field->parameters->get( 'prix', 'à partir de €' ) ;
+		$lot      = $field->parameters->get( 'lot', 'lot X' ) ;
+		$type      = $field->parameters->get( 'type', 'Tx' ) ;
+		$prix16      = $field->parameters->get( 'prix1', '€' ) ;
+		$prix7      = $field->parameters->get( 'prix1', '€' ) ;
 		$surface   = $field->parameters->get( 'surface', '' ) ;
 		$etage   = $field->parameters->get( 'etage', 'Nb étages' ) ;
 		$balcon   = $field->parameters->get( 'balcon', '' ) ;
@@ -74,8 +76,10 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		// Initialise property with default value
 		if ( !$field->value ) {
 			$field->value = array();
-			$field->value[0]['type']  = JText::_($type, 'tx - lot X');
-			$field->value[0]['prix']  = JText::_($prix, 'à partir de X€');
+			$field->value[0]['lot']  = JText::_($type, 'lot X');
+			$field->value[0]['type']  = JText::_($type, 'Tx');
+			$field->value[0]['prix16']  = JText::_($prix, '€');
+			$field->value[0]['prix7']  = JText::_($prix, '€');
 			$field->value[0]['surface'] = JText::_($surface, 'X');
 			$field->value[0]['etage'] = JText::_($etage, 'Nb étages');
 			$field->value[0]['balcon'] = JText::_($balcon, 'X');
@@ -141,14 +145,22 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 					}
 					var has_select2  = jQuery(thisNewField).find('div.select2-container').length != 0;
 					if (has_select2) jQuery(thisNewField).find('div.select2-container').remove();
+					
+					thisNewField.getElements('input.ylot').setProperty('value','lot X');
+					thisNewField.getElements('input.ylot').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][lot]');
+					thisNewField.getElements('input.ylot').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_lot');
 
-					thisNewField.getElements('input.ytype').setProperty('value','Tx - lot X');
+					thisNewField.getElements('input.ytype').setProperty('value','Tx');
 					thisNewField.getElements('input.ytype').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][type]');
 					thisNewField.getElements('input.ytype').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_type');
 
-					thisNewField.getElements('input.yprix').setProperty('value','à partir de X€');
-					thisNewField.getElements('input.yprix').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][prix]');
-					thisNewField.getElements('input.yprix').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_prix');
+					thisNewField.getElements('input.yprix16').setProperty('value','X€');
+					thisNewField.getElements('input.yprix16').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][prix7]');
+					thisNewField.getElements('input.yprix16').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_prix7');
+					
+					thisNewField.getElements('input.yprix7').setProperty('value','X€');
+					thisNewField.getElements('input.yprix7').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][prix7]');
+					thisNewField.getElements('input.yprix7').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_prix7');
 
 					thisNewField.getElements('input.ysurface').setProperty('value','X');
 					thisNewField.getElements('input.ysurface').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][surface]');
@@ -306,7 +318,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
 				$value = unserialize($value);
 			} else {
-				$value = array('type' => '', 'prix' => '', 'surface' => '', 'etage' => '', 'balcon'=>'', 'exposition' => '', 'pdf' => $value);
+				$value = array( 'lot' => '', 'type' => '', 'prix16' => '','prix7' => '', 'surface' => '', 'etage' => '', 'balcon'=>'', 'exposition' => '', 'pdf' => $value);
 			}
 			$file_ids[] = $value['pdf'];
 			$unserialized_values[] = $value;
@@ -323,16 +335,25 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 //dump($fieldname , "new fieldname");
 			$elementid = FLEXI_J16GE ? 'custom_'.$field->name.'_'.$n : $field->name.'_'.$n;
 //dump($value , "value ".$n);
-
+			
+			$lot = '
+				<label class="label">Lot:</label>
+				<input class="ylot'.$required.' fcfield_textval inputbox" name="'.$fieldname.'[lot]" id="'.$elementid.'_lot" type="text" size="5" value="'.$value['lot'].'" />
+			';
 
 			$type = '
 				<label class="label">Type:</label>
-				<input class="ytype'.$required.' fcfield_textval inputbox" name="'.$fieldname.'[type]" id="'.$elementid.'_type" type="text" size="15" value="'.$value['type'].'" />
+				<input class="ytype'.$required.' fcfield_textval inputbox" name="'.$fieldname.'[type]" id="'.$elementid.'_type" type="text" size="5" value="'.$value['type'].'" />
 			';
 
-			$prix = '
-				<label class="label">prix:</label>
-				<input class="yprix fcfield_textval inputbox" name="'.$fieldname.'[prix]" id="'.$elementid.'_prix" type="text" size="20" value="'.$value['prix'].'" />
+			$prix16 = '
+				<label class="label">prix 16,6%:</label>
+				<input class="yprix16 fcfield_textval inputbox" name="'.$fieldname.'[prix16]" id="'.$elementid.'_prix16" type="text" size="8" value="'.$value['prix16'].'" />
+			';
+			
+			$prix7 = '
+				<label class="label">prix 7%:</label>
+				<input class="yprix7 fcfield_textval inputbox" name="'.$fieldname.'[prix7]" id="'.$elementid.'_prix7" type="text" size="8" value="'.$value['prix7'].'" />
 			';
 
 			$surface= '
@@ -369,7 +390,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			$etage= '<label class="label" >Etages:</label>'.JHTML::_('select.genericlist', $options, $fieldname.'[etage]', " class='yetage use_select2_lib'", 'value', 'text', $value['etage'], $elementid.'_etage');
 			$balcon= '
 				<label class="label" >Balcon/Terrase :</label>
-				<input class="ybalcon fcfield_textval inputbox" name="'.$fieldname.'[balcon]" id="'.$elementid.'_balcon"  type="text" size="2" value="'.$value['balcon'].'" />
+				<input class="ybalcon fcfield_textval inputbox" name="'.$fieldname.'[balcon]" id="'.$elementid.'_balcon"  type="text" size="15" value="'.$value['balcon'].'" />
 			';
 			// generate state drop down list
 
@@ -431,11 +452,13 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			JDispatcher::getInstance()->trigger('onExtratablePrepareForm', array($context, $item, $field, $n, &$plugincontents, $this->params->toArray()));
 
 
-			//generation du code HTML pour un groupe de champ
+			//generation du code HTML pour un groupe de champ coté admin
 			$field->html[] = '
 			<div style="border: 1px solid #ccc; border-radius:5px;padding:5px;margin-bottom:5px;margin-top:5px;background:#F4F4F4;display:table;">
+				<div style="float:left;">'.$lot.'</div>
 				<div style="float:left;">'.$type.'</div>
-				<div style="float:left;">'.$prix.'</div>
+				<div style="float:left;">'.$prix16.'</div>
+				<div style="float:left;">'.$prix7.'</div>
 				<div style="float:left;">'.$surface.'</div>
 				<div style="float:left;">'.$etage.'</div>
 				<div style="float:left;">'.$balcon.'</div>
@@ -547,14 +570,12 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
 				$value = unserialize($value);
 			} else {
-				$value = array('type' => '', 'prix' => '', 'surface' => '', 'etage' => '', 'balcon'=>'', 'exposition' => '', 'pdf' => $value);
+				$value = array( 'lot' => '','type' => '', 'prix16' => '', 'prix7' => '', 'surface' => '', 'etage' => '', 'balcon'=>'', 'exposition' => '', 'pdf' => $value);
 			}
 			$file_ids[] = $value['pdf'];
 			$unserialized_values[] = $value;
 		}
 		$files_data = $this->getFileData( $file_ids, $published=false );
-
-		
 		
 		// ***************************************************
 		// Get user access level (these are multiple for J2.5)
@@ -618,8 +639,10 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 
 			$field->{$prop}[] =
 				'<tr>'.
+					$pretext.''.@ $value['lot'].''.$posttext.''.
 					$pretext.''.@ $value['type'].''.$posttext.''.
-					$pretext.''.@ $value['prix'].''.$posttext.''.
+					$pretext.''.@ $value['prix16'].''.$posttext.''.
+					$pretext.''.@ $value['prix7'].''.$posttext.''.
 					$pretext.''.@ $value['surface'].' m2 '.$posttext.''.
 					$pretext.''.@ $value['etage'].''.$posttext.''.
 					$pretext.''.@ $value['balcon']. ' m2 '.$posttext.''.
@@ -682,7 +705,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
 					$post[$n] = unserialize($post[$n]);
 				} else {
-					$post[$n] = array('type' => '', 'prix' => '', 'surface' => '', 'etage' => '', 'balcon' => '', 'exposition'=>'' ,'pdf'=> $post[$n]);
+					$post[$n] = array('lot' => '','type' => '', 'prix16' => '','prix7' => '', 'surface' => '', 'etage' => '', 'balcon' => '', 'exposition'=>'' ,'pdf'=> $post[$n]);
 				}
 			}
 
