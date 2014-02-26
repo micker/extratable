@@ -17,6 +17,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
+
 class plgFlexicontent_fieldsExtratable extends JPlugin
 {
 	static $field_types = array('extratable');
@@ -155,8 +156,8 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 					thisNewField.getElements('input.ytype').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_type');
 
 					thisNewField.getElements('input.yprix16').setProperty('value','X€');
-					thisNewField.getElements('input.yprix16').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][prix7]');
-					thisNewField.getElements('input.yprix16').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_prix7');
+					thisNewField.getElements('input.yprix16').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][prix16]');
+					thisNewField.getElements('input.yprix16').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_prix16');
 					
 					thisNewField.getElements('input.yprix7').setProperty('value','X€');
 					thisNewField.getElements('input.yprix7').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][prix7]');
@@ -466,7 +467,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 				<div style="float:left;">'.$pdf.'</div>
 				
 				<div style="float:left;">'.$move2.'</div>
-				<div style="float:left;">'.$remove_button.'</div>
+				'.$remove_button.'
 				<div style="float:left;">'.$plugincontents.'</div>
 				</div>
 
@@ -643,9 +644,9 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 					$pretext.''.@ $value['type'].''.$posttext.''.
 					$pretext.''.@ $value['prix16'].''.$posttext.''.
 					$pretext.''.@ $value['prix7'].''.$posttext.''.
-					$pretext.''.@ $value['surface'].' m2 '.$posttext.''.
+					$pretext.''.@ $value['surface'].''.$posttext.''.
 					$pretext.''.@ $value['etage'].''.$posttext.''.
-					$pretext.''.@ $value['balcon']. ' m2 '.$posttext.''.
+					$pretext.''.@ $value['balcon']. ''.$posttext.''.
 					$pretext.''.@ $value['exposition'].''.$posttext.''.
 
 					$pretext.$dl_text.$posttext.
@@ -667,13 +668,18 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		// **********************************************************
 
 
+		$slider = JHtml::_('sliders.start','test', array('useCookie'=>1 ,'startOffset'=>-1, 'startTransition'=>1));
+		$slider .=  JHtml::_('sliders.panel', $displayTotalLignes, 'slider1');
+		$endslider= JHtml::_('sliders.end');
+
 		if(count($field->{$prop})) {
-			$field->{$prop} = implode($separatorf, $field->{$prop});
-			$field->{$prop} = $displayTotalLignes . $opentag . $field->{$prop} . $closetag;
-		} else {
-			$field->{$prop} = '';
-		}
-	}
+            $field->{$prop} = implode($separatorf, $field->{$prop});
+            $field->{$prop} =$slider . $opentag . $field->{$prop} . $closetag . $endslider;
+            } else {
+				$field->{$prop} = '';
+            }
+        }
+
 
 
 
