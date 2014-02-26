@@ -166,10 +166,12 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 					thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][exposition]');
 					thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_exposition');
 
-					thisNewField.getElements('input.ypdf').setProperty('value','pdf');
+					thisNewField.getElements('input.ypdf').setProperty('value','');
 					thisNewField.getElements('input.ypdf').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][pdf]');
-
 					thisNewField.getElements('input.ypdf').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_pdf');
+					thisNewField.getElements('input.ypdf_name').setProperty('value','');
+					thisNewField.getElements('input.ypdf_name').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][pdf_filename]');
+					thisNewField.getElements('input.ypdf_name').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_pdf_filename');
 					
 
 					thisNewField.getElements('a.addfile_".$field->id."').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
@@ -414,7 +416,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			$pdf= '
 				<label class="label" >PDF:</label>
 				<input class="ypdf fcfield_textval inputbox" name="'.$fieldname.'[pdf]" id="'.$elementid.'_pdf"  type="hidden" size="2" value="'.$file_id.'" />
-				<input class="ypdf fcfield_textval inputbox" name="'.$fieldname.'[pdf_filename]" id="'.$elementid.'_pdf_filename"  type="text" size="15" value="'.$filename.'" />
+				<input class="ypdf_name fcfield_textval inputbox" name="'.$fieldname.'[pdf_filename]" id="'.$elementid.'_pdf_filename"  type="text" size="15" value="'.$filename.'" />
 			';
 			$pdf .="<div class=\"fcfield-button-add\" style=\"display:inline-block;\">
 			<div class=\"blank\">
@@ -431,18 +433,18 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 
 			//generation du code HTML pour un groupe de champ
 			$field->html[] = '
-			<div style="border: 1px solid #ccc; border-radius:5px;padding:5px;margin-bottom:5pxmargin-top:5px;background:#F4F4F4;">
-				'.$type.'
-				'.$prix.'
-				'.$surface.'
-				'.$etage.'
-				'.$balcon.'
-				'.$exposition.'
-				'.$pdf.'
-				<br>
-				'.$move2.'
-				'.$remove_button.'
-				'.$plugincontents.'
+			<div style="border: 1px solid #ccc; border-radius:5px;padding:5px;margin-bottom:5px;margin-top:5px;background:#F4F4F4;display:table;">
+				<div style="float:left;">'.$type.'</div>
+				<div style="float:left;">'.$prix.'</div>
+				<div style="float:left;">'.$surface.'</div>
+				<div style="float:left;">'.$etage.'</div>
+				<div style="float:left;">'.$balcon.'</div>
+				<div style="float:left;">'.$exposition.'</div>
+				<div style="float:left;">'.$pdf.'</div>
+				
+				<div style="float:left;">'.$move2.'</div>
+				<div style="float:left;">'.$remove_button.'</div>
+				<div style="float:left;">'.$plugincontents.'</div>
 				</div>
 
 				';
