@@ -338,28 +338,28 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 //dump($value , "value ".$n);
 			
 			$lot = '
-				<label class="label">Lot:</label>
-				<input class="ylot'.$required.' fcfield_textval inputbox" name="'.$fieldname.'[lot]" id="'.$elementid.'_lot" type="text" size="5" value="'.$value['lot'].'" />
+				<tr><td class="key"><label class="label">Lot:</label></td>
+				<td><input class="ylot'.$required.' fcfield_textval inputbox" name="'.$fieldname.'[lot]" id="'.$elementid.'_lot" type="text" size="5" value="'.$value['lot'].'" /></td>
 			';
 
 			$type = '
-				<label class="label">Type:</label>
-				<input class="ytype'.$required.' fcfield_textval inputbox" name="'.$fieldname.'[type]" id="'.$elementid.'_type" type="text" size="5" value="'.$value['type'].'" />
+				<td class="key"><label class="label">Type:</label></td>
+				<td><input class="ytype'.$required.' fcfield_textval inputbox" name="'.$fieldname.'[type]" id="'.$elementid.'_type" type="text" size="5" value="'.$value['type'].'" /></td>
 			';
 
 			$prix16 = '
-				<label class="label">prix 16,6%:</label>
-				<input class="yprix16 fcfield_textval inputbox" name="'.$fieldname.'[prix16]" id="'.$elementid.'_prix16" type="text" size="8" value="'.$value['prix16'].'" />
+				<tr><td class="key"><label class="label">prix 16,6%:</label></td>
+				<td><input class="yprix16 fcfield_textval inputbox" name="'.$fieldname.'[prix16]" id="'.$elementid.'_prix16" type="text" size="8" value="'.$value['prix16'].'" /></td>
 			';
 			
 			$prix7 = '
-				<label class="label">prix 7%:</label>
-				<input class="yprix7 fcfield_textval inputbox" name="'.$fieldname.'[prix7]" id="'.$elementid.'_prix7" type="text" size="8" value="'.$value['prix7'].'" />
+				<td class="key"><label class="label">prix 7%:</label></td>
+				<td><input class="yprix7 fcfield_textval inputbox" name="'.$fieldname.'[prix7]" id="'.$elementid.'_prix7" type="text" size="8" value="'.$value['prix7'].'" /></td>
 			';
 
 			$surface= '
-				<label class="label">Surface:</label>
-				<input class="ysurface fcfield_textval inputbox" name="'.$fieldname.'[surface]" id="'.$elementid.'_surface" type="text" size="2" value="'.$value['surface'].'" />
+				<tr><td class="key"><label class="label">Surface:</label></td>
+				<td><input class="ysurface fcfield_textval inputbox" name="'.$fieldname.'[surface]" id="'.$elementid.'_surface" type="text" size="2" value="'.$value['surface'].'" /></td>
 			';
 
                 // generate state drop down list
@@ -388,10 +388,10 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
                         }
                         $i++;
                 }
-			$etage= '<label class="label" >Etages:</label>'.JHTML::_('select.genericlist', $options, $fieldname.'[etage]', " class='yetage use_select2_lib'", 'value', 'text', $value['etage'], $elementid.'_etage');
+			$etage= '<td class="key"><label class="label" >Etages:</label></td><td>'.JHTML::_('select.genericlist', $options, $fieldname.'[etage]', " class='yetage use_select2_lib'", 'value', 'text', $value['etage'], $elementid.'_etage').'</td>';
 			$balcon= '
-				<label class="label" >Balcon/Terrase :</label>
-				<input class="ybalcon fcfield_textval inputbox" name="'.$fieldname.'[balcon]" id="'.$elementid.'_balcon"  type="text" size="15" value="'.$value['balcon'].'" />
+				<tr><td class="key"><label class="label" >Balcon/Terrase :</label></td>
+				<td><input class="ybalcon fcfield_textval inputbox" name="'.$fieldname.'[balcon]" id="'.$elementid.'_balcon"  type="text" size="15" value="'.$value['balcon'].'" /></td>
 			';
 			// generate state drop down list
 
@@ -418,7 +418,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
                         $i++;
                 }
 
-			$exposition= '<label class="label" >Exposition:</label>'.JHTML::_('select.genericlist', $options, $fieldname.'[exposition]', " class='yexposition  use_select2_lib'", 'value', 'text', $value['exposition'], $elementid.'_exposition');
+			$exposition= '<td class="key"><label class="label" >Exposition:</label></td><td>'.JHTML::_('select.genericlist', $options, $fieldname.'[exposition]', " class='yexposition  use_select2_lib'", 'value', 'text', $value['exposition'], $elementid.'_exposition').'</td></tr>';
 
 			/*début du code pour ajouter le bouton pour lancer le filemanager de FLEXIcontent*/
 			$user = JFactory::getUser();
@@ -436,14 +436,14 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			}
 			
 			$pdf= '
-				<label class="label" >PDF:</label>
+				<tr><td class="key"><label class="label" >PDF:</label></td>
 				<input class="ypdf fcfield_textval inputbox" name="'.$fieldname.'[pdf]" id="'.$elementid.'_pdf"  type="hidden" size="2" value="'.$file_id.'" />
-				<input class="ypdf_name fcfield_textval inputbox" name="'.$fieldname.'[pdf_filename]" id="'.$elementid.'_pdf_filename"  type="text" size="15" value="'.$filename.'" />
+				<td><input class="ypdf_name fcfield_textval inputbox" name="'.$fieldname.'[pdf_filename]" id="'.$elementid.'_pdf_filename"  type="text" size="15" value="'.$filename.'" />
 			';
 			$pdf .="<div class=\"fcfield-button-add\" style=\"display:inline-block;\">
 			<div class=\"blank\">
-			<a class=\"addfile_".$field->id."\" onclick='activeRow".$field->id."=this.id.replace(\"_addfile\",\"\");' id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_PDF' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_PDF' )."</a>
-			</div></div>
+			<a class=\"addfile_".$field->id."\" onclick='activeRow".$field->id."=this.id.replace(\"_addfile\",\"\");' id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_PDF' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">PDF</a>
+			</div></div></td>
 			";
 
 			// import des plugins pour étendre le champ Extratable (offres, ...)
@@ -455,22 +455,26 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 
 			//generation du code HTML pour un groupe de champ coté admin
 			$field->html[] = '
-			<div style="border: 1px solid #ccc; border-radius:5px;padding:5px;margin-bottom:5px;margin-top:5px;background:#F4F4F4;display:table;">
-				<div style="float:left;">'.$lot.'</div>
-				<div style="float:left;">'.$type.'</div>
-				<div style="float:left;">'.$prix16.'</div>
-				<div style="float:left;">'.$prix7.'</div>
-				<div style="float:left;">'.$surface.'</div>
-				<div style="float:left;">'.$etage.'</div>
-				<div style="float:left;">'.$balcon.'</div>
-				<div style="float:left;">'.$exposition.'</div>
-				<div style="float:left;">'.$pdf.'</div>
+			<div style="background:#EAEAEA;border-radius:5px;margin-bottom:10px;padding:5px;border:1px solid #ccc">
+			<table class="admintable"><tbody>
+				'.$lot.'
+				'.$type.'
+				<td>'.$move2.'</td></tr>
+				'.$prix16.'
+				'.$prix7.'
+				<td></tr>
+				'.$surface.'
+				'.$etage.'
+				<td>'.$plugincontents.'</td></tr>
+				'.$balcon.'
+				'.$exposition.'
+				'.$pdf.'
 				
-				<div style="float:left;">'.$move2.'</div>
+				
+				
+			</tbody></table></div>
 				'.$remove_button.'
-				<div style="float:left;">'.$plugincontents.'</div>
-				</div>
-
+				
 				';
 
 			$n++;
