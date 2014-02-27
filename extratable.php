@@ -598,7 +598,8 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		foreach ($unserialized_values as $value)
 		{
 			$file_id = (int) $value['pdf'];
-			//if ( empty($files_data[$file_id]) ) continue; //si pdf vide
+			$lot = $value['lot'];
+			if ( empty($lot) ) continue; //si pdf vide
 
 			// *****************************
 			// Check user access on the file
@@ -661,7 +662,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		// *******************
 		$totalLignes = $n;
 		$displayTotalLignes = $precount.' '. $totalLignes.' '.$postcount;
-		
+		$affiche = 1;
 		
 		// **********************************************************
 		// Display field HTML, applying separator and open/close tags
@@ -672,7 +673,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		$slider .=  JHtml::_('sliders.panel', $displayTotalLignes, 'slider1');
 		$endslider= JHtml::_('sliders.end');
 
-		if(count($field->{$prop})) {
+		if(count($field->{$prop}) && ($affiche == 1)) {
             $field->{$prop} = implode($separatorf, $field->{$prop});
             $field->{$prop} =$slider . $opentag . $field->{$prop} . $closetag . $endslider;
             } else {
