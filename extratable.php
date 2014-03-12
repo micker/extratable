@@ -117,6 +117,12 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		{
 			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
 
+			// import des plugins pour étendre le code de la fontion javascript 'addFieldnnn' (nettoyage du champ additionnnel, ...)
+			JPluginHelper::importPlugin('extratable');
+			$context = "plg_flexicontent_fields.extratable";
+			$pluginJScode="";
+			JDispatcher::getInstance()->trigger('onExtratableJSAddField', array($context, $item, $field, &$pluginJScode, $this->params->toArray()));
+
 			// Add the drag and drop sorting feature
 			$js .= "
 			window.addEvent('domready', function(){
@@ -194,6 +200,9 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 					jQuery(thisNewField).insertAfter( jQuery(thisField) );
 
 					SqueezeBox.initialize({});
+
+					".$pluginJScode."
+
 					if (MooTools.version>='1.2.4') {
 
 						SqueezeBox.assign($$('a.addfile_".$field->id."'), {
@@ -396,14 +405,15 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			// generate state drop down list
 
                         $listarrays2 = array(
-                                                array('nord','nord'),
-												array('nord-ouest','nord-ouest'),
-												array('nord-est','nord-est'),
-                                                array('sud','sud'),
-												array('sud-ouest','sud-ouest'),
-												array('sud-est','sud-est'),
-                                                array('est','est'),
-                                                array('ouest','ouest'));
+						array('nord','nord'),
+						array('nord-ouest','nord-ouest'),
+						array('nord-est','nord-est'),
+						array('sud','sud'),
+						array('sud-ouest','sud-ouest'),
+						array('sud-est','sud-est'),
+						array('est','est'),
+						array('ouest','ouest')
+					);
 
                 $options = array();
                 $options[] = JHTML::_('select.option', '', 'Exposition');
@@ -447,11 +457,10 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			";
 
 			// import des plugins pour étendre le champ Extratable (offres, ...)
-			JPluginHelper::importPlugin('amallia');
+			JPluginHelper::importPlugin('extratable');
 			$context = "plg_flexicontent_fields.extratable";
 			$plugincontents="";
 			JDispatcher::getInstance()->trigger('onExtratablePrepareForm', array($context, $item, $field, $n, &$plugincontents, $this->params->toArray()));
-
 
 			//generation du code HTML pour un groupe de champ coté admin
 			$field->html[] = '
