@@ -117,12 +117,6 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		{
 			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
 
-			// import des plugins pour étendre le code de la fontion javascript 'addFieldnnn' (nettoyage du champ additionnnel, ...)
-			JPluginHelper::importPlugin('extratable');
-			$context = "plg_flexicontent_fields.extratable";
-			$pluginJScode="";
-			JDispatcher::getInstance()->trigger('onExtratableJSAddField', array($context, $item, $field, &$pluginJScode, $this->params->toArray()));
-
 			// Add the drag and drop sorting feature
 			$js .= "
 			window.addEvent('domready', function(){
@@ -141,75 +135,75 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			
 			
 			function addField".$field->id."(el) {
-				if((rowCount".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
-
-					var thisField 	 = $(el).getPrevious().getLast();
+				if((rowCount".$field->id." >= maxVal".$field->id.") && (maxVal".$field->id." != 0)) return;
+				
+				var thisField = $(el).getPrevious().getLast();
+				if (rowCount".$field->id." > 0) {
 					var thisNewField = thisField.clone();
-					if (MooTools.version>='1.2.4') {
-						var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
-					} else {
-						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
-					}
-					var has_select2  = jQuery(thisNewField).find('div.select2-container').length != 0;
-					if (has_select2) jQuery(thisNewField).find('div.select2-container').remove();
-					
-					thisNewField.getElements('input.ylot').setProperty('value','lot X');
-					thisNewField.getElements('input.ylot').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][lot]');
-					thisNewField.getElements('input.ylot').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_lot');
+				} else {
+					var thisNewField = thisField;
+				}
+				
+				var has_select2  = jQuery(thisNewField).find('div.select2-container').length != 0;
+				if (has_select2) jQuery(thisNewField).find('div.select2-container').remove();
+				
+				thisNewField.getElements('input.ylot').setProperty('value','lot X');
+				thisNewField.getElements('input.ylot').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][lot]');
+				thisNewField.getElements('input.ylot').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_lot');
 
-					thisNewField.getElements('input.ytype').setProperty('value','Tx');
-					thisNewField.getElements('input.ytype').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][type]');
-					thisNewField.getElements('input.ytype').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_type');
+				thisNewField.getElements('input.ytype').setProperty('value','Tx');
+				thisNewField.getElements('input.ytype').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][type]');
+				thisNewField.getElements('input.ytype').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_type');
 
-					thisNewField.getElements('input.yprix16').setProperty('value','X€');
-					thisNewField.getElements('input.yprix16').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][prix16]');
-					thisNewField.getElements('input.yprix16').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_prix16');
-					
-					thisNewField.getElements('input.yprix7').setProperty('value','X€');
-					thisNewField.getElements('input.yprix7').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][prix7]');
-					thisNewField.getElements('input.yprix7').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_prix7');
+				thisNewField.getElements('input.yprix16').setProperty('value','X€');
+				thisNewField.getElements('input.yprix16').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][prix16]');
+				thisNewField.getElements('input.yprix16').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_prix16');
+				
+				thisNewField.getElements('input.yprix7').setProperty('value','X€');
+				thisNewField.getElements('input.yprix7').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][prix7]');
+				thisNewField.getElements('input.yprix7').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_prix7');
 
-					thisNewField.getElements('input.ysurface').setProperty('value','X');
-					thisNewField.getElements('input.ysurface').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][surface]');
-					thisNewField.getElements('input.ysurface').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_surface');
+				thisNewField.getElements('input.ysurface').setProperty('value','X');
+				thisNewField.getElements('input.ysurface').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][surface]');
+				thisNewField.getElements('input.ysurface').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_surface');
 
-					thisNewField.getElements('select.yetage.use_select2_lib').setProperty('value','Nb étages');
-					thisNewField.getElements('select.yetage.use_select2_lib').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][etage]');
-					thisNewField.getElements('select.yetage.use_select2_lib').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_etage');
+				thisNewField.getElements('select.yetage.use_select2_lib').setProperty('value','');
+				thisNewField.getElements('select.yetage.use_select2_lib').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][etage]');
+				thisNewField.getElements('select.yetage.use_select2_lib').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_etage');
 
-					thisNewField.getElements('input.ybalcon').setProperty('value','X');
-					thisNewField.getElements('input.ybalcon').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][balcon]');
-					thisNewField.getElements('input.ybalcon').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_balcon');
+				thisNewField.getElements('input.ybalcon').setProperty('value','X');
+				thisNewField.getElements('input.ybalcon').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][balcon]');
+				thisNewField.getElements('input.ybalcon').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_balcon');
 
-					thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('value','Exposition');
-					thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][exposition]');
-					thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_exposition');
+				thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('value','');
+				thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][exposition]');
+				thisNewField.getElements('select.yexposition.use_select2_lib').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_exposition');
 
-					thisNewField.getElements('input.ypdf').setProperty('value','');
-					thisNewField.getElements('input.ypdf').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][pdf]');
-					thisNewField.getElements('input.ypdf').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_pdf');
-					thisNewField.getElements('input.ypdf_name').setProperty('value','');
-					thisNewField.getElements('input.ypdf_name').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][pdf_filename]');
-					thisNewField.getElements('input.ypdf_name').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_pdf_filename');
-					
-
-					thisNewField.getElements('a.addfile_".$field->id."').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
-					thisNewField.getElements('a.addfile_".$field->id."').setProperty('href','".
-					JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&index="+uniqueRowNum'.$field->id.'+"&field='.$field->id.'&itemid='.$item->id.'&autoselect=1&items=0&filter_uploader='.$user->id.'&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1');
-					if (has_select2)  jQuery(thisNewField).find('select.use_select2_lib').select2();
+				thisNewField.getElements('input.ypdf').setProperty('value','');
+				thisNewField.getElements('input.ypdf').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][pdf]');
+				thisNewField.getElements('input.ypdf').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_pdf');
+				thisNewField.getElements('input.ypdf_name').setProperty('value','');
+				thisNewField.getElements('input.ypdf_name').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][pdf_filename]');
+				thisNewField.getElements('input.ypdf_name').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_pdf_filename');
+				
+				thisNewField.getElements('a.addfile_".$field->id."').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
+				thisNewField.getElements('a.addfile_".$field->id."').setProperty('href','".
+				JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&index="+uniqueRowNum'.$field->id.'+"&field='.$field->id.'&itemid='.$item->id.'&autoselect=1&items=0&filter_uploader='.$user->id.'&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1');
+				if (has_select2)  jQuery(thisNewField).find('select.use_select2_lib').select2();
+				
+				if(rowCount".$field->id." > 0)
+				{
+					jQuery(thisNewField).css('display', 'none');
 					jQuery(thisNewField).insertAfter( jQuery(thisField) );
-
 					SqueezeBox.initialize({});
-
-					".$pluginJScode."
-
-					if (MooTools.version>='1.2.4') {
-
+					if (MooTools.version>='1.2.4')
+					{
 						SqueezeBox.assign($$('a.addfile_".$field->id."'), {
 							parse: 'rel'
 						});
-					} else {
-
+					}
+					else
+					{
 						$$('a.addfile_".$field->id."').each(function(el) {
 							el.addEvent('click', function(e) {
 								new Event(e).stop();
@@ -217,44 +211,31 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 							});
 						});
 					}
-
+					
 					new Sortables($('sortables_".$field->id."'), {
 						'constrain': true,
 						'clone': true,
 						'handle': '.fcfield-drag'
 					});
-
-					fx.start({ 'opacity': 1 }).chain(function(){
-						this.setOptions({duration: 600});
-						this.start({ 'opacity': 0 });
-						})
-						.chain(function(){
-							this.setOptions({duration: 300});
-							this.start({ 'opacity': 1 });
-						});
-
-					rowCount".$field->id."++;       // incremented / decremented
-					uniqueRowNum".$field->id."++;   // incremented only
 				}
+				
+				jQuery(thisNewField).show('slide');
+				rowCount".$field->id."++;       // incremented / decremented
+				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
 			function deleteField".$field->id."(el)
 			{
-				if(rowCount".$field->id." <= 1) return;
-				var field	= $(el);
-				var row		= field.getParent();
-				if (MooTools.version>='1.2.4') {
-					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+				if(rowCount".$field->id." <= 0) return;
+				var row = jQuery(el).closest('li');
+				
+				if(rowCount".$field->id." == 1) {
+					row.find('input.ypdf').val('');
+					row.find('input.ypdf_name').val('');
+					jQuery(row).hide('slide');
 				} else {
-					var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
+					jQuery(row).hide('slide', function() { $(this).remove(); } );
 				}
-
-				fx.start({
-					'height': 0,
-					'opacity': 0
-				}).chain(function(){
-					(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
-				});
 				rowCount".$field->id."--;
 			}
 			";
@@ -291,7 +272,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			';
 
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= '<span class="fcfield-drag" >'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 
 		} else {
 			$remove_button = '';
@@ -306,7 +287,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 
 		static $select2_added = false;
 	 	if ( !$select2_added )
-	  	{
+	 	{
 			$select2_added = true;
 			flexicontent_html::loadFramework('select2');//code pour ajouter le javascript select2list (on rajoute use_select2_lib dans la class de la liste)
 		}
@@ -347,88 +328,95 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 //dump($value , "value ".$n);
 			
 			$lot = '
-				<tr><td class="key"><label class="label">Lot:</label></td>
+				<td style="text-align:right;"><label class="label">Lot</label></td>
 				<td><input class="ylot'.$required.' fcfield_textval inputbox" name="'.$fieldname.'[lot]" id="'.$elementid.'_lot" type="text" size="5" value="'.$value['lot'].'" /></td>
 			';
 
 			$type = '
-				<td class="key"><label class="label">Type:</label></td>
+				<td style="text-align:right;"><label class="label">Type</label></td>
 				<td><input class="ytype'.$required.' fcfield_textval inputbox" name="'.$fieldname.'[type]" id="'.$elementid.'_type" type="text" size="5" value="'.$value['type'].'" /></td>
 			';
 
 			$prix16 = '
-				<tr><td class="key"><label class="label">prix 16,6%:</label></td>
+				<td style="text-align:right;"><label class="label">prix 16,6%</label></td>
 				<td><input class="yprix16 fcfield_textval inputbox" name="'.$fieldname.'[prix16]" id="'.$elementid.'_prix16" type="text" size="8" value="'.$value['prix16'].'" /></td>
 			';
 			
 			$prix7 = '
-				<td class="key"><label class="label">prix 7%:</label></td>
+				<td style="text-align:right;"><label class="label">prix 7%</label></td>
 				<td><input class="yprix7 fcfield_textval inputbox" name="'.$fieldname.'[prix7]" id="'.$elementid.'_prix7" type="text" size="8" value="'.$value['prix7'].'" /></td>
 			';
 
 			$surface= '
-				<tr><td class="key"><label class="label">Surface:</label></td>
+				<td style="text-align:right;"><label class="label">Surface</label></td>
 				<td><input class="ysurface fcfield_textval inputbox" name="'.$fieldname.'[surface]" id="'.$elementid.'_surface" type="text" size="2" value="'.$value['surface'].'" /></td>
 			';
-
-                // generate state drop down list
-
-                        $listarrays = array(
-                                                array('RDC','RDC'),
-												array('1','1'),
-                                                array('2','2'),
-                                                array('3','3'),
-                                                array('4','4'),
-                                                array('5','5'),
-                                                array('6','6'),
-                                                array('7','7'),
-                                                array('8','8'),
-                                                array('9','9'),
-                                                array('10','10'));
-                $options = array();
-                $options[] = JHTML::_('select.option', '', 'Nb Etage');
-                $i = 1;
-
-                $display = "";
-                foreach ($listarrays as $listarray) {
-                        $options[] = JHTML::_('select.option', $listarray[0], $listarray[1]);
-                        if ($field->value[0] == $listarray[0]) {
-                                $display = $listarray[1];
-                        }
-                        $i++;
-                }
-			$etage= '<td class="key"><label class="label" >Etages:</label></td><td>'.JHTML::_('select.genericlist', $options, $fieldname.'[etage]', " class='yetage use_select2_lib'", 'value', 'text', $value['etage'], $elementid.'_etage').'</td>';
+			
+			// generate state drop down list
+			$listarrays = array(
+				array('RDC','RDC'),
+				array('1','1'),
+				array('2','2'),
+				array('3','3'),
+				array('4','4'),
+				array('5','5'),
+				array('6','6'),
+				array('7','7'),
+				array('8','8'),
+				array('9','9'),
+				array('10','10')
+			);
+			$options = array();
+			$options[] = JHTML::_('select.option', '', 'Nb Etage');
+			$i = 1;
+			
+			$display = "";
+			foreach ($listarrays as $listarray) {
+				$options[] = JHTML::_('select.option', $listarray[0], $listarray[1]);
+				if ($field->value[0] == $listarray[0]) {
+					$display = $listarray[1];
+				}
+				$i++;
+			}
+			
+			$etage= '
+				<td style="text-align:right;"><label class="label">Etages</label></td>
+				<td>'.JHTML::_('select.genericlist', $options, $fieldname.'[etage]', " class='yetage use_select2_lib'", 'value', 'text', $value['etage'], $elementid.'_etage').'</td>
+			';
 			$balcon= '
-				<tr><td class="key"><label class="label" >Balcon/Terrase :</label></td>
+				<td style="text-align:right;"><label class="label">Balcon/Terrase</label></td>
 				<td><input class="ybalcon fcfield_textval inputbox" name="'.$fieldname.'[balcon]" id="'.$elementid.'_balcon"  type="text" size="15" value="'.$value['balcon'].'" /></td>
 			';
 			// generate state drop down list
-
-                        $listarrays2 = array(
-						array('nord','nord'),
-						array('nord-ouest','nord-ouest'),
-						array('nord-est','nord-est'),
-						array('sud','sud'),
-						array('sud-ouest','sud-ouest'),
-						array('sud-est','sud-est'),
-						array('est','est'),
-						array('ouest','ouest')
-					);
-
-                $options = array();
-                $options[] = JHTML::_('select.option', '', 'Exposition');
-                $i = 1;
-
-                $display = "";
-                foreach ($listarrays2 as $listarray2) {
-                        $options[] = JHTML::_('select.option', $listarray2[0], $listarray2[1]);
-                        if ($field->value[0] == $listarray2[0]) {
-                                $display = $listarray2[1];
-                        }
-                        $i++;
-                }
-
-			$exposition= '<td class="key"><label class="label" >Exposition:</label></td><td>'.JHTML::_('select.genericlist', $options, $fieldname.'[exposition]', " class='yexposition  use_select2_lib'", 'value', 'text', $value['exposition'], $elementid.'_exposition').'</td></tr>';
+			
+			$listarrays2 = array(
+				array('nord','nord'),
+				array('nord-ouest','nord-ouest'),
+				array('nord-est','nord-est'),
+				array('sud','sud'),
+				array('sud-ouest','sud-ouest'),
+				array('sud-est','sud-est'),
+				array('est','est'),
+				array('ouest','ouest')
+			);
+			
+			$options = array();
+			$options[] = JHTML::_('select.option', '', JText::_( 'FLEXI_SELECT' ));
+			$i = 1;
+			
+			$display = "";
+			foreach ($listarrays2 as $listarray2) {
+				$options[] = JHTML::_('select.option', $listarray2[0], $listarray2[1]);
+				if ($field->value[0] == $listarray2[0]) {
+					$display = $listarray2[1];
+				}
+				$i++;
+			}
+			
+			$exposition= '
+				<td style="text-align:right;"><label class="label">Exposition</label></td>
+				<td>'.JHTML::_('select.genericlist', $options, $fieldname.'[exposition]', " class='yexposition  use_select2_lib'", 'value', 'text', $value['exposition'], $elementid.'_exposition').'</td>
+			';
 
 			/*début du code pour ajouter le bouton pour lancer le filemanager de FLEXIcontent*/
 			$user = JFactory::getUser();
@@ -446,52 +434,60 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			}
 			
 			$pdf= '
-				<tr><td class="key"><label class="label" >PDF:</label></td>
-				<input class="ypdf fcfield_textval inputbox" name="'.$fieldname.'[pdf]" id="'.$elementid.'_pdf"  type="hidden" size="2" value="'.$file_id.'" />
-				<td><input class="ypdf_name fcfield_textval inputbox" name="'.$fieldname.'[pdf_filename]" id="'.$elementid.'_pdf_filename"  type="text" size="15" value="'.$filename.'" />
+				<td style="text-align:right;"><label class="label">PDF</label></td>
+					<td colspan="3">
+						<input class="ypdf fcfield_textval inputbox" name="'.$fieldname.'[pdf]" id="'.$elementid.'_pdf"  type="hidden" size="2" value="'.$file_id.'" />
+						<input class="ypdf_name fcfield_textval inputbox" readonly="readonly" name="'.$fieldname.'[pdf_filename]" id="'.$elementid.'_pdf_filename"  type="text" size="15" value="'.$filename.'" />
 			';
-			$pdf .="<div class=\"fcfield-button-add\" style=\"display:inline-block;\">
-			<div class=\"blank\">
-			<a class=\"addfile_".$field->id."\" onclick='activeRow".$field->id."=this.id.replace(\"_addfile\",\"\");' id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_PDF' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">PDF</a>
-			</div></div></td>
+			$pdf .="
+					<div class=\"fcfield-button-add\" style=\"display:inline-block;\">
+						<div class=\"blank\">
+							<a class=\"addfile_".$field->id."\" onclick='activeRow".$field->id."=this.id.replace(\"_addfile\",\"\");' id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_SELECT')." PDF\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT' )."</a>
+						</div>
+					</div>
+				</td>
 			";
 
 			// import des plugins pour étendre le champ Extratable (offres, ...)
-			JPluginHelper::importPlugin('extratable');
+			JPluginHelper::importPlugin('amallia');
 			$context = "plg_flexicontent_fields.extratable";
 			$plugincontents="";
 			JDispatcher::getInstance()->trigger('onExtratablePrepareForm', array($context, $item, $field, $n, &$plugincontents, $this->params->toArray()));
 
+
 			//generation du code HTML pour un groupe de champ coté admin
 			$field->html[] = '
-			<div style="background:#EAEAEA;border-radius:5px;margin-bottom:10px;padding:5px;border:1px solid #ccc">
-			<table class="admintable"><tbody>
-				'.$lot.'
-				'.$type.'
-				<td>'.$move2.'</td></tr>
-				'.$prix16.'
-				'.$prix7.'
-				<td></tr>
-				'.$surface.'
-				'.$etage.'
-				<td>'.$plugincontents.'</td></tr>
-				'.$balcon.'
-				'.$exposition.'
-				'.$pdf.'
+			<div style="width:80%;float:left;">
+			<table class="admintable" style="width:auto; display:inline;"><tbody>
+				<tr>
+					'.$lot.'
+					'.$type.'
+				</tr><tr>
+					'.$prix16.'
+					'.$prix7.'
+				</tr><tr>
+					'.$surface.'
+					'.$etage.'
+				</tr><tr>
+					'.$balcon.'
+					'.$exposition.'
+				</tr><tr>
+					'.$pdf /* has colspan="3" */.'
+				</tr>
+			</tbody></table>
 				
-				
-				
-			</tbody></table></div>
-				'.$remove_button.'
-				
-				';
+			</div>
+			'.$move2.'
+			'.$remove_button.'
+			'.$plugincontents.'
+			';
 
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 
 		if ($multiple) { // handle multiple records
-			$li_list = '<li>'. implode('</li><li>', $field->html) .'</li>';
+			$li_list = '<li style="background:#EAEAEA;border-radius:5px;margin-bottom:10px;padding:5px;border:1px solid #ccc; display:inline-block;width:680px;height:174px;">'. implode('</li><li>', $field->html) .'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$li_list. '</ul>';
 			$field->html .= '<input type="button" class="fcfield-addvalue" style="clear:both;" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 		} else {  // handle single values
@@ -728,7 +724,8 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 					$post[$n] = array('lot' => '','type' => '', 'prix16' => '','prix7' => '', 'surface' => '', 'etage' => '', 'balcon' => '', 'exposition'=>'' ,'pdf'=> $post[$n]);
 				}
 			}
-
+			
+			if ($post[$n]['pdf'] == '') continue;  // Skip empty values
 			$newpost[$new] = $post[$n];
 			$new++;
 		}
