@@ -117,6 +117,12 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		{
 			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
 
+			// import des plugins pour étendre le code de la fonction javascript 'addFieldnnn' (nettoyage du champ additionnnel, ...)
+			JPluginHelper::importPlugin('extratable');
+			$context = "plg_flexicontent_fields.extratable";
+			$pluginJScode="";
+			JDispatcher::getInstance()->trigger('onExtratableJSAddField', array($context, $item, $field, &$pluginJScode, $this->params->toArray()));
+
 			// Add the drag and drop sorting feature
 			$js .= "
 			window.addEvent('domready', function(){
@@ -196,6 +202,9 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 					jQuery(thisNewField).css('display', 'none');
 					jQuery(thisNewField).insertAfter( jQuery(thisField) );
 					SqueezeBox.initialize({});
+					
+					".$pluginJScode."					
+					
 					if (MooTools.version>='1.2.4')
 					{
 						SqueezeBox.assign($$('a.addfile_".$field->id."'), {
@@ -449,7 +458,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 			";
 
 			// import des plugins pour étendre le champ Extratable (offres, ...)
-			JPluginHelper::importPlugin('amallia');
+			JPluginHelper::importPlugin('extratable');
 			$context = "plg_flexicontent_fields.extratable";
 			$plugincontents="";
 			JDispatcher::getInstance()->trigger('onExtratablePrepareForm', array($context, $item, $field, $n, &$plugincontents, $this->params->toArray()));
