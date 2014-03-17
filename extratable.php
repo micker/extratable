@@ -1,10 +1,10 @@
 <?php
 /**
- * @version 1.0 $Id: weblink.php 1627 2013-01-14 06:59:25Z ggppdk $
+ * @version 1.0 $Id: weblink.php 1627 2014-03-14 06:59:25Z micker $
  * @package Joomla
  * @subpackage FLEXIcontent
- * @subpackage plugin.weblink
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @subpackage plugin.extratable
+ * @copyright (C) 2014 Micker - www.com3elles.com
  * @license GNU/GPL v2
  *
  * FLEXIcontent is distributed in the hope that it will be useful,
