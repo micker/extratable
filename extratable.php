@@ -496,7 +496,7 @@ class plgFlexicontent_fieldsExtratable extends JPlugin
 		}
 
 		if ($multiple) { // handle multiple records
-			$li_list = '<li style="background:#EAEAEA;border-radius:5px;margin-bottom:10px;padding:5px;border:1px solid #ccc; display:inline-block;width:680px;height:174px;">'. implode('</li><li>', $field->html) .'</li>';
+			$li_list = '<li style="background:#EAEAEA;border-radius:5px;margin-bottom:10px;padding:5px;border:1px solid #ccc;width:680px;height:174px;">'. implode('</li><li style="background:#EAEAEA;border-radius:5px;margin-bottom:10px;padding:5px;border:1px solid #ccc; width:680px;height:174px;">', $field->html) .'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$li_list. '</ul>';
 			$field->html .= '<input type="button" class="fcfield-addvalue" style="clear:both;" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 		} else {  // handle single values
